@@ -1225,13 +1225,31 @@ with st.form("client_audit_form"):
             "Name of Managed Service Provider (or N/A)",
             "Enter the name of the MSP providing services to this organization."
         ), unsafe_allow_html=True)
-        msp_name = st.text_input("MSP Company Name", key="msp_name", label_visibility="collapsed")
+        
+        # Get MSP name from URL parameters if available
+        default_msp_name = st.session_state.utm_params.get('msp_name', '')
+        
+        msp_name = st.text_input(
+            "MSP Company Name", 
+            key="msp_name",
+            value=default_msp_name,
+            label_visibility="collapsed"
+        )
         
         st.markdown(create_tooltip(
             "Organization Name *",
             "Enter the legal business name of the organization as it appears on official documents."
         ), unsafe_allow_html=True)
-        organization_name = st.text_input("Organization Name", key="organization_name", label_visibility="collapsed")
+        
+        # Get organization name from URL parameters if available
+        default_organization = st.session_state.utm_params.get('organization', '')
+        
+        organization_name = st.text_input(
+            "Organization Name", 
+            key="organization_name",
+            value=default_organization,
+            label_visibility="collapsed"
+        )
         
         if is_msp_only:
             st.markdown(create_tooltip(
