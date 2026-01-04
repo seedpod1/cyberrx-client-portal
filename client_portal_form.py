@@ -29,7 +29,7 @@ st.set_page_config(
 # Extract UTM parameters from URL
 # Extract UTM parameters from URL
 def get_utm_params():
-    """Extract UTM parameters from URL query string"""
+    """Extract UTM parameters and custom parameters from URL query string"""
     try:
         # Get query params
         query_params = st.query_params
@@ -40,8 +40,14 @@ def get_utm_params():
         
         utm_data = {}
         
+        # All parameters we want to extract (standard UTM + custom client data)
+        all_params = [
+            'utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content',
+            'msp_name', 'msp_contact', 'organization', 'client_name', 'client_email'
+        ]
+        
         # Try different methods to extract params
-        for param in ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content']:
+        for param in all_params:
             try:
                 # Method 1: Direct dictionary access
                 if hasattr(query_params, '__getitem__'):
@@ -76,7 +82,12 @@ def get_utm_params():
             'utm_medium': '',
             'utm_campaign': '',
             'utm_term': '',
-            'utm_content': ''
+            'utm_content': '',
+            'msp_name': '',
+            'msp_contact': '',
+            'organization': '',
+            'client_name': '',
+            'client_email': ''
         }
 
 # Store UTM parameters in session state on first load
@@ -1162,6 +1173,19 @@ with st.form("client_audit_form"):
     # Always show MSP contact information for both modes
     st.markdown('<div class="section-header"><h2>👤 Contact Information</h2><p>Information about the representative completing this assessment</p></div>', unsafe_allow_html=True)
     
+    # Get client info from URL parameters
+    default_client_name = st.session_state.utm_params.get('client_name', '')
+    default_client_email = st.session_state.utm_params.get('client_email', '')
+    
+    # Split client name into first and last (if provided as full name)
+    if default_client_name and ' ' in default_client_name:
+        name_parts = default_client_name.split(' ', 1)
+        default_first_name = name_parts[0]
+        default_last_name = name_parts[1] if len(name_parts) > 1 else ''
+    else:
+        default_first_name = default_client_name
+        default_last_name = ''
+    
     col1, col2 = st.columns(2)
     
     with col1:
@@ -1169,19 +1193,34 @@ with st.form("client_audit_form"):
             "First Name *",
             "Enter the first name of the representative completing this assessment."
         ), unsafe_allow_html=True)
-        first_name = st.text_input("Representative First Name", key="first_name", label_visibility="collapsed")
+        first_name = st.text_input(
+            "Representative First Name", 
+            key="first_name",
+            value=default_first_name,
+            label_visibility="collapsed"
+        )
         
         st.markdown(create_tooltip(
             "Last Name *",
             "Enter the last name of the representative completing this assessment."
         ), unsafe_allow_html=True)
-        last_name = st.text_input("Representative Last Name", key="last_name", label_visibility="collapsed")
+        last_name = st.text_input(
+            "Representative Last Name", 
+            key="last_name",
+            value=default_last_name,
+            label_visibility="collapsed"
+        )
         
         st.markdown(create_tooltip(
             "Email Address *",
             "Enter the email address of the representative for follow-up communications."
         ), unsafe_allow_html=True)
-        email = st.text_input("Representative Email", key="email", label_visibility="collapsed")
+        email = st.text_input(
+            "Representative Email", 
+            key="email",
+            value=default_client_email,
+            label_visibility="collapsed"
+        )
     
     with col2:
         st.markdown(create_tooltip(
@@ -1398,6 +1437,7 @@ with st.form("client_audit_form"):
     client_port_blocking = "Not Applicable"
     client_mdr = "Not Applicable"
     client_soc = "Not Applicable"
+    client_access_control = "Not Applicable"
     client_security_comments = ""
 
     
