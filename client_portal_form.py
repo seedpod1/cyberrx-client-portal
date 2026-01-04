@@ -1438,7 +1438,11 @@ with st.form("client_audit_form"):
     client_mdr = "Not Applicable"
     client_soc = "Not Applicable"
     client_access_control = "Not Applicable"
+    client_remote_access = "Not Applicable"
+    client_security_training = "Not Applicable"
+    client_email_auth = "Not Applicable"
     client_security_comments = ""
+
 
     
     # Submit Button
