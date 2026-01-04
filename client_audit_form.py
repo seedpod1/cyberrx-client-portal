@@ -1116,17 +1116,8 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Check access before showing any content
-if not check_access():
-    st.stop()  # Stop execution if access not granted
-
-# Add logout option in sidebar
-with st.sidebar:
-    st.markdown("---")
-    if st.button("🚪 Logout", help="Clear access and return to login"):
-        st.session_state.access_granted = False
-        st.session_state.clear()  # Clear all session state
-        st.rerun()
+# Client portal - no access check required for client business information
+# Access is automatically granted
 
 # SeedPod Logo for main page
 try:
@@ -1145,55 +1136,27 @@ except:
 
 st.markdown("""
 <div class="main-header">
-    <h1>🛡️ CyberRX Insurability Audit</h1>
-    <h3>Cybersecurity Risk Assessment</h3>
-    <p>Complete assessment of cyber insurance, security and controls</p>
+    <h1>🛡️ Client Business Information</h1>
+    <h3>Cyber Insurance Assessment - Client Portion</h3>
+    <p>Please provide business information about your organization</p>
 </div>
 """, unsafe_allow_html=True)
 
-# Completion Method Selection
+# Client Portal - Automatically set to business information only mode
+# Clients only fill out: Organization info, Loss history, Authentication, Insurance
+# No technical security questions
+
+# Force the mode to show only business sections (no security questions)
+is_msp_only = False  # This shows business info sections
+completion_method = "Client completing business information"
+
+# Hide the completion method selection - clients don't need to see this
 st.markdown("""
 <div class="completion-method">
-    <h2>📋 Assessment Completion Method</h2>
-    <p>Please select how this assessment will be completed:</p>
+    <h2>📋 Business Information Form</h2>
+    <p>Please provide the following information about your organization</p>
 </div>
 """, unsafe_allow_html=True)
-
-if "completion_method" not in st.session_state:
-    st.session_state.completion_method = "MSP/Organization completes entire questionnaire"  
-
-
-completion_method = st.radio(
-    "Who will complete this assessment?",
-    [
-        "MSP/Organization completes entire questionnaire",
-        "MSP completes security questions only (organization will complete business information separately)"
-    ],
-    key="completion_method",
-    help="Choose based on your arrangement with the client"
-)
-
-# Store completion method in session state
-
-# st.session_state.completion_method = completion_method
-
-# or whatever your default is
-
-# # Now render the widget
-# completion_method = st.radio(
-#     "Choose a completion method:",
-#     ["auto", "manual"],
-#     key="completion_method"
-# )
-is_msp_only = "security questions only" in completion_method
-
-if is_msp_only:
-    st.info("""
-    🔄 **Split Assessment Process:**
-    1. You (MSP) will complete the security-related questions
-    2. Upon submission, an email will be sent to your client to complete the business information
-    3. Two separate CSV files will be generated for tracking
-    """)
 
 with st.form("client_audit_form"):
     # Always show MSP contact information for both modes
